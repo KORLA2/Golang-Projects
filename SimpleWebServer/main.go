@@ -28,7 +28,8 @@ func main() {
 
 	})
 
-	http.HandleFunc("GET /form", HandleForm)
+	http.HandleFunc("/form", HandleForm)
 
 	http.ListenAndServe(":8080", nil)
+
 }
