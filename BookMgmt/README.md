@@ -1,1 +1,1 @@
-Practicing a simple book management system in Golang using Gin and Postrgres 
+Practicing a simple book management system in Golang using Gin and Postrgres in a single table Book.
