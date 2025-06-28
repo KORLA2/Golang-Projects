@@ -39,45 +39,46 @@ func main() {
 		log.Fatal("DB Connection failed", err.Error())
 	}
 	db.AutoMigrate(&User{})
-	// userdata := User{Name: "Goutham", Age: 24, Address: "Rajiv Gruha Kalpa"}
-	// // create a record in db
+	userdata := User{Name: "Goutham", Age: 24, Address: "Rajiv Gruha Kalpa"}
+	// create a record in db
 
-	// if err = db.Create(&userdata).Error; err != nil {
-	// 	log.Fatal("Creating database failed", err)
+	if err = db.Create(&userdata).Error; err != nil {
+		log.Fatal("Creating database failed", err)
 
-	// }
+	}
 
-	// // Create a multiple records in the database;
+	// Create a multiple records in the database;
 
-	// userdatas := []*User{
-	// 	{
-	// 		Name: "Laptop", Age: 12, Address: "Pragathi nagar",
-	// 	}, {
-	// 		Name: "CHair", Age: 10, Address: "nizampet",
-	// 	},
-	// }
+	userdatas := []*User{
+		{
+			Name: "Laptop", Age: 12, Address: "Pragathi nagar",
+		}, {
+			Name: "CHair", Age: 10, Address: "nizampet",
+		},
+	}
 
-	// db.Create(userdatas)
+	db.Create(userdatas)
 
-	//retrieve the record with specific field
+	// retrieve the record with specific field
 
-	// var userfetched User
-	// db.Where(&User{Name: "Laptop", Age: 12}).First(&userfetched)
+	var userfetched User
+	db.Where(&User{Name: "Laptop", Age: 12}).First(&userfetched)
 
-	// fmt.Printf("%+v", userfetched)
+	fmt.Printf("%+v", userfetched)
 
 	// Get all records.
-	// usersdata := []User{}
-	// db.Find(&usersdata)
-	// fmt.Println(usersdata)
+	usersdata := []User{}
+	db.Find(&usersdata)
+	fmt.Println(usersdata)
 
 	// Update Records
+
 	// Update Single column;
-	// db.Model(&User{}).Where("ID=?", 4).Update("Name", "Screen")
+	db.Model(&User{}).Where("ID=?", 4).Update("Name", "Screen")
 
-	//Update  multiple columns
+	// Update  multiple columns
 
-	// db.Model(&User{}).Where("ID=?", 4).Updates(User{Name: "Keyboard", Age: 45})
+	db.Model(&User{}).Where("ID=?", 4).Updates(User{Name: "Keyboard", Age: 45})
 
 	// Delete record;
 
