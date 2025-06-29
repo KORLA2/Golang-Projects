@@ -1,30 +1,30 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
+	"github.com/Goutham/Gin/database"
 	"github.com/Goutham/Gin/routes"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load(".env")
+
 	port := os.Getenv("PORT")
 
-	if port == "" {
-		port = "8080"
-	}
-
-	fmt.Println(port)
 	router := gin.New()
 
 	router.Use(gin.Logger())
 
+	db, err := database.NewConnection()
+
+	if err != nil {
+		log.Fatal("Unable to establish connection with postgres", err.Error())
+	}
 	routes.AuthRoutes(router)
 	routes.UserRoutes(router)
 
-	router.Run(":" + port)
+	router.Run(":", port)
 
 }

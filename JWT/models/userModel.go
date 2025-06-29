@@ -3,9 +3,11 @@ package models
 import "time"
 
 type User struct {
-	FirstName string `json:"fname" validate: `
-	LastName  string
-	CreateAt  time.Time
-	UpdateAt  time.Time
-	userid    string
+	ID       uint
+	Name     string    `json:"name" validate:"required" `
+	Email    string    `json:"email" validate:"required email" `
+	Phone    string    `json:"phone" validate:"required numeric" `
+	CreateAt time.Time `json:"createdat"`
+	UpdateAt time.Time `json:"updatedat"`
+	Userid   string
 }
