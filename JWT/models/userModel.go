@@ -3,11 +3,15 @@ package models
 import "time"
 
 type User struct {
-	ID       uint
-	Name     string    `json:"name" validate:"required" `
-	Email    string    `json:"email" validate:"required email" `
-	Phone    string    `json:"phone" validate:"required numeric" `
-	CreateAt time.Time `json:"createdat"`
-	UpdateAt time.Time `json:"updatedat"`
-	Userid   string
+	ID            uint      `json:"id" gorm:"primaryKey"`
+	Name          string    `json:"name" validate:"required,min=3,max=100" `
+	Email         string    `json:"email" validate:"required,email" gorm:"not null;uniqueIndex"`
+	Password      string    `json:"password" validate:"required,passwd,min=6"`
+	Phone         string    `json:"phone" validate:"required,numeric" gorm:" not null;uniqueIndex"`
+	CreateAt      time.Time `json:"createdat"`
+	UpdateAt      time.Time `json:"updatedat"`
+	UserID        string    `json:"userID" gorm:"uniqueIndex" `
+	Token         string    `json:"token"`
+	Refresh_Token string    `json:"refresh_token"`
+	User_Type     string    `json:"user_type" validate:"required, eq=ADMIN|eq=USER"`
 }

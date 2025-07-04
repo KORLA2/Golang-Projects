@@ -10,7 +10,8 @@ import (
 func UserRoutes(incomingRoutes *gin.Engine, db *gorm.DB) {
 
 	incomingRoutes.Use(middleware.Auth())
-	incomingRoutes.GET("/user/:id", controller.GetUser(db))
+
+	incomingRoutes.GET("/user/:userID", controller.GetUser(db))
 	incomingRoutes.GET("/users", controller.GetUsers(db))
 
 }
