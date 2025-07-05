@@ -1,0 +1,7 @@
+package chat;
+
+type  struct {
+	
+}
+
+

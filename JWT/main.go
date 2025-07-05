@@ -22,8 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Unable to establish connection with postgres", err.Error())
 	}
-	routes.AuthRoutes(router)
-	routes.UserRoutes(router)
+	routes.AuthRoutes(router,db)
+	routes.UserRoutes(router,db)
 
 	router.Run(":", port)
 

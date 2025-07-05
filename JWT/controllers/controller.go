@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Goutham/Gin/helper"
@@ -146,13 +147,17 @@ func GetUsers(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
+		records, _ := strconv.Atoi(ctx.Query("recordperpage"))
+		pageno, _ := strconv.Atoi(ctx.Query("pageno"))
+		offset := (pageno - 1) * records
+
 		var users = []models.User{}
-		if err := db.Find(&users).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Database Error",
-				"Error":   err.Error(),
+
+		if err := db.Offset(offset).Limit(records).Find(&users).Error; err != nil {
+
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"Pagination Error": err.Error(),
 			})
-			return
 		}
 		ctx.JSON(200, gin.H{
 			"users": users,
