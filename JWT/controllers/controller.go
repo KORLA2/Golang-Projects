@@ -64,6 +64,7 @@ func SignIn(db *gorm.DB) gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"Password Check Failed": err.Error(),
 			})
+			return
 		}
 
 		token, refresh_token, _ := helper.GenerateAllTokens(foundUser.Email, foundUser.Name, foundUser.UserID, foundUser.User_Type)
@@ -73,6 +74,7 @@ func SignIn(db *gorm.DB) gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"Unable to update the token": err.Error(),
 			})
+			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
 			"Log IN successful": foundUser,
@@ -87,7 +89,7 @@ func SignUp(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		var user models.User
-		if err := ctx.BindJSON(user); err != nil {
+		if err := ctx.BindJSON(&user); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"Request not good Sign Up": err.Error(),
 			})
@@ -108,8 +110,8 @@ func SignUp(db *gorm.DB) gin.HandlerFunc {
 		}
 		user.Password = pass
 		user.UserID = uuid.New().String()
-		user.CreateAt, _ = time.Parse(time.RFC1123, time.Now().Format(time.RFC1123))
-		user.UpdateAt = user.CreateAt
+		user.CreatedAt, _ = time.Parse(time.RFC1123, time.Now().Format(time.RFC1123))
+		user.UpdatedAt = user.CreatedAt
 		token, refresh_token, err := helper.GenerateAllTokens(user.Email, user.Name, user.UserID, user.User_Type)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -120,6 +122,13 @@ func SignUp(db *gorm.DB) gin.HandlerFunc {
 
 		user.Token = token
 		user.Refresh_Token = refresh_token
+
+		if err = db.AutoMigrate(&models.User{}); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"Table Creation Failed": err.Error(),
+			})
+			return
+		}
 
 		if err := db.Create(user).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{

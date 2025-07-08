@@ -2,16 +2,15 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/Goutham/Gin/database"
 	"github.com/Goutham/Gin/routes"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-
-	port := os.Getenv("PORT")
+	godotenv.Load(".env")
 
 	router := gin.New()
 
@@ -22,9 +21,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Unable to establish connection with postgres", err.Error())
 	}
-	routes.AuthRoutes(router,db)
-	routes.UserRoutes(router,db)
 
-	router.Run(":", port)
+	routes.AuthRoutes(router, db)
+	routes.UserRoutes(router, db)
+
+	router.Run(":8090")
 
 }

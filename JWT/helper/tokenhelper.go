@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"os"
 	"time"
 
@@ -16,6 +17,27 @@ type SignedDetails struct {
 	UserID    string
 	User_Type string
 	jwt.RegisteredClaims
+}
+
+var _ = godotenv.Load(".env")
+var secret_key = os.Getenv("SECRET_KEY")
+
+func VerifyToken(userToken string) (*SignedDetails, error) {
+	token, err := jwt.ParseWithClaims(userToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(secret_key), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(*SignedDetails)
+
+	if !ok {
+		return nil, errors.New("error validaitng token provided")
+	}
+	if claims.ExpiresAt.Time.Before(time.Now()) {
+		return nil, errors.New("token expired")
+	}
+	return claims, nil
 }
 
 func UpdateToken(db *gorm.DB, token, refresh_token, PhoneNumber string) error {
@@ -34,8 +56,6 @@ func UpdateToken(db *gorm.DB, token, refresh_token, PhoneNumber string) error {
 
 func GenerateAllTokens(Email, Name, UserID, User_Type string) (string, string, error) {
 
-	secret_key := os.Getenv("SECRET_KEY")
-	godotenv.Load(".env")
 	claims := &SignedDetails{
 		Email:     Email,
 		Name:      Name,
