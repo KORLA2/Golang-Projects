@@ -11,6 +11,7 @@ type User struct {
 	Email         string     `json:"email" validate:"required,email" gorm:"unique;notnull"`
 	Password      string     `json:"password" validate:"required,min=6"`
 	CreatedAt     time.Time  `json:"createdat"`
+	UpdateddAt    time.Time  `json:"updatedat"`
 	UserID        string     `json:"userID" gorm:"unique;notnull" `
 	Token         string     `json:"token"`
 	Refresh_Token string     `json:"refresh_token"`

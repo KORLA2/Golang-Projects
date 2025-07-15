@@ -1,6 +1,7 @@
 package main
 
 import (
+	"myapp/database"
 	"myapp/routes"
 	"os"
 
@@ -13,6 +14,9 @@ func main() {
 	router := gin.New()
 
 	router.Use(gin.Logger())
+
+	DB, _ := database.NewConnection()
+
 	routes.NonAuthRoutes(router, DB)
 	routes.AuthRoutes(router)
 
