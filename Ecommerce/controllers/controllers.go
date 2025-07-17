@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import (
 	"myapp/models"
@@ -45,20 +45,20 @@ func SignUp(db *gorm.DB) gin.HandlerFunc {
 		if err := db.AutoMigrate(&models.User{}); err != nil {
 
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"user table creation error": err.Error(),
+				"User table creation error": err.Error(),
 			})
 			return
 		}
 
 		if err := db.Create(&user).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"user creation failed": err.Error(),
+				"User creation failed": err.Error(),
 			})
 			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"User SignedUP": user,
+			"User SignedUp": user,
 		})
 
 	}
@@ -89,13 +89,12 @@ func SignIn(db *gorm.DB) gin.HandlerFunc {
 
 		foundUser.Token = token
 		foundUser.Refresh_Token = refreshtoken
- 
-		if err:=verifyPassword(user.Password,foundUser.Password);err!=nil{
-			ctx.JSON(http.StatusBadRequest,gin.H{
-				"Password Not Correct":err.Error(),
+
+		if err := VerifyPassword(user.Password, foundUser.Password); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"Password Not Correct": err.Error(),
 			})
 		}
-
 
 		if err := db.Model(&user).Where("phone=?", user.Phone).Updates(foundUser).Error; err != nil {
 

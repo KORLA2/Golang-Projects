@@ -16,12 +16,12 @@ func NonAuthRoutes(router *gin.Engine, DB *gorm.DB) {
 	router.GET("/user/search", controller.SearchProducts)
 
 }
-func AuthRoutes(router *gin.Engine) {
+func AuthRoutes(router *gin.Engine, DB *gorm.DB) {
 
 	router.Use(middleware.Authenticate())
 
-	router.GET("/addtocart", controller.AddToCart())
-	router.GET("/removeItem", controller.RemoveItem())
-	router.GET("/instantbuy", controller.InstantBuy())
+	router.GET("/addtocart/:ProductID/:UserID", controller.AddToCart(DB))
+	router.GET("/removeItem", controller.RemoveItemFromCart(DB))
+	router.GET("/buynow", controller.BuyNow(DB))
 	router.GET("/cartcheckout", controller.CartCheckOut())
 }
