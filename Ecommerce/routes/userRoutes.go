@@ -10,10 +10,10 @@ import (
 func NonAuthRoutes(router *gin.Engine, DB *gorm.DB) {
 
 	router.POST("/user/signup", controller.SignUp(DB))
-	router.POST("/user/signin", controller.SignIn)
-	router.POST("/admin/addproduct", controller.AddProduct)
-	router.GET("/user/products", controller.GetProducts)
-	router.GET("/user/search", controller.SearchProducts)
+	router.POST("/user/signin", controller.SignIn(DB))
+	router.POST("/admin/addproduct", controller.AddProduct(DB))
+	router.GET("/user/search", controller.SearchProducts(DB))
+	router.GET("/user/search/:ProductID", controller.SearchProductsQuery(DB))
 
 }
 func AuthRoutes(router *gin.Engine, DB *gorm.DB) {

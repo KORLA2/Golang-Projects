@@ -11,7 +11,7 @@ func AddtoCart(DB *gorm.DB, ProductID, UserID int) (*models.CartItem, error) {
 	CartItem := &models.CartItem{
 		UserID: UserID,
 		PID:    ProductID,
-	}
+	}	
 
 	err := DB.Create(CartItem).Error
 

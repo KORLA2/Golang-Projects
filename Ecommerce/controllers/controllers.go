@@ -7,13 +7,31 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 var validate = validator.New()
 
-func HashPassword() string {
+func HashPassword(password string) (string,error) {
+	hashpassword,err:=bcrypt.GenerateFromPassword([]byte(password),14);
 
+if err!=nil{
+return "",err;
+}
+
+return string(hashpassword),nil;
+}
+
+func VerifyPassword(userpassword,hashedpassword string) (bool,error) {
+
+   err:=bcrypt.CompareHashAndPassword([]byte(hashedpassword),[]byte(userpassword));
+if err!=nil{
+
+	return false,err;
+}
+
+return true,nil;
 }
 
 func SignUp(db *gorm.DB) gin.HandlerFunc {
@@ -34,7 +52,14 @@ func SignUp(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		user.Password = HashPassword()
+		hashedPassword ,err:= HashPassword(user.Password)
+		if err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{
+				"Cannot Hash the given password":err.Error(),
+			})
+			return;
+		}
+		user.Password=hashedPassword;
 		user.CreatedAt, _ = time.Parse(time.RFC1123, time.Now().Format(time.RFC1123))
 		user.UpdateddAt = user.CreatedAt
 		user.Token, user.RefreshToken := helper.GenerateToken(user.Name, user.Phone, user.Email, user.UserID)
@@ -90,10 +115,11 @@ func SignIn(db *gorm.DB) gin.HandlerFunc {
 		foundUser.Token = token
 		foundUser.Refresh_Token = refreshtoken
 
-		if err := VerifyPassword(user.Password, foundUser.Password); err != nil {
+		if _,err := VerifyPassword(user.Password, foundUser.Password); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"Password Not Correct": err.Error(),
 			})
+			return;
 		}
 
 		if err := db.Model(&user).Where("phone=?", user.Phone).Updates(foundUser).Error; err != nil {
@@ -111,3 +137,4 @@ func SignIn(db *gorm.DB) gin.HandlerFunc {
 	}
 
 }
+

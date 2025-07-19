@@ -56,7 +56,9 @@ type Product struct {
 
 type Address struct {
 	ID      int    `json:"id" gorm:"primaryKey;autoIncrement"`
-	UserID  int    `json:"uid"`
+	ANo     int    `json:"ano" validate:"required" `
+	UserID  int    `json:"uid" validate:"required"`
+	User    User   `gorm:"foreignKey:UserID"`
 	AptName string `json:"aptname" validate:"required" `
 	Street  string `json:"street" validate:"required"`
 	City    string `json:"city" validate:"required"`
