@@ -24,7 +24,7 @@ func AddToCart(DB *gorm.DB) gin.HandlerFunc {
 		}
 
 		ProductID, _ := strconv.Atoi(ProductParamID)
-		UserID, _ := strconv.Atoi(UserParamID)
+		UserID := UserParamID
 		Item, err := database.AddtoCart(DB, ProductID, UserID)
 
 		if err != nil {
@@ -72,10 +72,12 @@ func RemoveItemFromCart(DB *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+
+
 func BuyNow(DB *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ProductParamID := ctx.Param("ProductID")
-		UserParamID := ctx.Param("UserID")
+		UserID := ctx.Param("UserID")
 
 		if ProductParamID == "" || UserParamID == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -85,7 +87,7 @@ func BuyNow(DB *gorm.DB) gin.HandlerFunc {
 		}
 
 		ProductID, _ := strconv.Atoi(ProductParamID)
-		UserID, _ := strconv.Atoi(UserParamID)
+	
 		Item, err := database.BuyNow(DB, ProductID, UserID)
 
 		if err != nil {
@@ -101,3 +103,35 @@ func BuyNow(DB *gorm.DB) gin.HandlerFunc {
 
 	}
 }
+
+func GetItemFromCart(db *gorm.DB) gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+
+		userID := ctx.Query("userID")
+
+		if userID == "" {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"Error": "User ID is required",
+			})
+			return
+		}
+		total := 0
+		if err := db.Table("cart_items").
+			Select("SUM(cart_items.Quantity*products.price)").
+			Joins("JOIN products ON cart_items.pid = products.pid").
+			Where("cart_items.user_id=?", userID).Scan(&total).Error; err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"Unable to get Items from your Cart": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"Total Value of Items in your Cart": total,
+		})
+
+	}
+
+}
+

@@ -22,8 +22,8 @@ type User struct {
 
 type Order struct {
 	OID        int         `json:"oid" gorm:"primaryKey;autoIncrement"`
-	UserID     int         `json:"uid"`
-	User       User        `gorm:"foreignKey:UserID"`
+	UserID     string      `json:"uid"`
+	User       User        `gorm:"foreignKey:UserID;references:UserID"`
 	OrderdAt   time.Time   `json:"createdat"`
 	Status     string      `json:"status"`
 	OrderItems []OrderItem `gorm:"foreignKey:OrderID"`
@@ -39,11 +39,12 @@ type OrderItem struct {
 }
 
 type CartItem struct {
-	CID     int     `json:"cid" gorm:"primaryKey;autoIncrement"`
-	UserID  int     `json:"uid"`
-	User    User    `gorm:"foreignKey:UserID"`
-	PID     int     `json:"pid"`
-	Product Product `gorm:"foreignKey:PID"`
+	CID      int     `json:"cid" gorm:"primaryKey;autoIncrement"`
+	UserID   string  `json:"uid"`
+	User     User    `gorm:"foreignKey:UserID;references:UserID"`
+	Quantity int     `json:"quantity" validate:"required,numeric"`
+	PID      int     `json:"pid"`
+	Product  Product `gorm:"foreignKey:PID"`
 }
 
 type Product struct {
@@ -57,8 +58,8 @@ type Product struct {
 type Address struct {
 	ID      int    `json:"id" gorm:"primaryKey;autoIncrement"`
 	ANo     int    `json:"ano" validate:"required" `
-	UserID  int    `json:"uid" validate:"required"`
-	User    User   `gorm:"foreignKey:UserID"`
+	UserID  string `json:"uid" validate:"required"`
+	User    User   `gorm:"foreignKey:UserID;references:UserID"`
 	AptName string `json:"aptname" validate:"required" `
 	Street  string `json:"street" validate:"required"`
 	City    string `json:"city" validate:"required"`

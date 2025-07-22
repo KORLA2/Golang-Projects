@@ -9,16 +9,48 @@ import (
 	"gorm.io/gorm"
 )
 
-func AddAddress() {
+func AddAddress(db *gorm.DB) gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
+
+		userID := ctx.Query("userID")
+		var Address models.Address
+		ctx.BindJSON(Address)
+		Address.UserID = userID
+		var count int
+		if err := db.Table("address").
+			Select("COALESCE(MAX(ano), 0)").
+			Where("address.user_id=?", userID).
+			Scan(&count).Error; err != nil {
+
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"Unable to find address": err,
+			})
+			return
+		}
+
+		Address.ANo = count + 1
+
+		if err := db.Create(&Address).Error; err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"Unable to Create Address": err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{
+			"Success": Address,
+		})
+
+	}
 
 }
 
 func DeleteAddress(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		UID, err1 := strconv.Atoi(ctx.Query("UID"))
-		AID, err2 := strconv.Atoi(ctx.Query("AddressID"))
+		UID := ctx.Query("UID")
+		AID, err2 := strconv.Atoi(ctx.Query("ANo"))
 
-		if err1 != nil || err2 != nil {
+		if UID == "" || err2 != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"UserID or AddressID Cannot be null": "",
 			})
@@ -37,6 +69,14 @@ func DeleteAddress(db *gorm.DB) gin.HandlerFunc {
 		ctx.JSON(200, gin.H{
 			"Successfully Deleted the address for ": target,
 		})
+
+	}
+
+}
+
+func EditAddress() gin.HandlerFunc {
+
+	return func(ctx *gin.Context) {
 
 	}
 
